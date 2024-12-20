@@ -1,0 +1,5 @@
+리눅스 meld 로 디렉토리 비교 시 디렉토리 및 파일 리스트에 아무것도 보이지 않는 현상
+	--> "sudo apt install adwaita-icon-theme-full" 이것으로 해결함 : 2024-12-19(목)
+
+리눅스 meld 로 preference 에서 변경이 안되는 현상
+	-->"apt install dbus-x11" 이것으로 해결함 : 2024-12-19(목)
