@@ -1,0 +1,73 @@
+brontodocker/tems_ubuntu
+	-. Image Pull
+		docker pull brontodocker/tems_ubuntu:2.5.0
+	-. Contailner 생성 & 실행
+		docker run -d -it -u bronto -p 10122:22 --name tems brontodocker/tems_ubuntu:2.5.0
+	-. Contailner 접속(진입)
+		docker exec -it tems bash
+	cf. Contailner 암호 분실 시
+		docker exec -u 0 -it tems bash	: root 로 로그인하여 암호를 변경함
+
+docker 설치
+	-. docker repository를 이용하여 설치하기 위해서 먼저 사전 작업이 필요
+		sudo apt-get update
+		sudo apt-get install \
+			apt-transport-https \
+			ca-certificates \
+			curl \
+			gnupg-agent \
+			software-properties-common
+	-. docker의 GPG key를 받아보고 검증
+		curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+		sudo apt-key fingerprint 0EBFCD88
+		
+	-. 사용할 저장소 설정
+		sudo add-apt-repository \
+			"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+			$(lsb_release -cs) \
+			stable"
+	-. docker engine을 설치
+		sudo apt-get update
+		sudo apt-get install docker-ce docker-ce-cli containerd.io
+		참고> sudo apt-get install docker-ce=<VERSION_STRING> docker-ce-cli=<VERSION_STRING> containerd.io	# 특정 버전을 설치
+		
+docker uninstall
+	-. 패키지 uninstall
+		sudo apt-get purge docker-ce docker-ce-cli containerd.io
+	-. image, container, 기타 설정 파일들을 모두 제거하고 싶다면
+		sudo rm -rf /var/lib/docker
+		
+서비스 관리
+	-. sudo systemctl enable docker		# 부팅 시 자동으로 docker를 실행
+	-. sudo systemctl disable docker	# 부팅 시 자동으로 docker 실행 기능 해제
+	
+sudo 없이 docker 실행
+	-. 유저를 docker 그룹에 추가함
+		sudo groupadd docker	# 이미 docker 그룹이 있을 것이므로, 필요 없음
+		sudo usermod -aG docker $USER
+
+docker 네트워크
+	-. 네트워크 생성
+		docker network create --driver = [네트워크 드라이버 이름] [만들 드라이버 이름]
+		ex> docker network create --driver=bridge bridge_new
+	-. 네트워크 삭제
+		docker network rm [네트워크 이름]
+		ex> docker network rm bridge_new
+	-. 컨테이너 실행시 network 지정
+		docker run -d ... --network=[네트워크 이름] [컨테이너 이름]
+		ex> docker run -d -it --network=bridge_new --name ubuntu_1 ubuntu
+	-. 이미 실행중인 컨테이너에 network 지정
+		docker network connect [네트워크 이름] [컨테이너 이름]
+		ex> docker network connect bridge_new ubuntu_1
+	-. 컨테이너의 network 제거
+		docker network disconnect [네트워크 이름] [컨테이너 이름]
+		ex> docker network disconnect bridge ubuntu_1	# 기본 네트워크 삭제
+	-. 다른 컨테이너와 네트워크 공유(일치)
+		docker run -it --name ubuntu_3 --net container:ubuntu_1 ubuntu	# ubuntu 이미지를 이용해서 ubuntu_1 과 같은 네트워크의 ubuntu_3 컨테이너를 실행함
+		
+docker 운영 예시
+	-. docker pull ubuntu
+	-. docker run -d -it --name ubuntu_1 --network=bridge_new -p 10122:22 -v /mnt/docker_shared:/mnt/docker_share ubuntu
+	-. docker run -d -it --name ubuntu_2 --network=bridge_new -p 10222:22 -v /mnt/docker_shared:/mnt/docker_share ubuntu
+	-. docker exec -it ubuntu_1 /bin/bash
+		. apt install -y net-tools iproute2 vim openssh-server
