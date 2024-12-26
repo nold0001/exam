@@ -1,0 +1,17 @@
+tmux pane 의 터미널 로그를 캡처하기		
+	cf) https://ko.linux-console.net/?p=14649	
+		
+	현재창의 내용을 캡처 버퍼에 저장함	
+		tmux capture-pane -b temp-capture-buffer -S -
+		또는, <Ctrl-b> + ":" ==> capture-pane -S -
+		
+	캡처 버퍼에 저장한 내용을 파일에 저장함	
+		tmux save-buffer -b temp-capture-buffer ~/tmux.log
+		또는, <Ctrl-b> + ":" ==> save-buffer ~/tmux.log
+		
+	캡처 버퍼를 삭제함	
+		tmux delete-buffer -b capture-buffer
+		또는, <Ctrl-b> + ":" ==> delete-buffer
+		
+	터미널 로그를 clear	
+		<Ctrl-b> + ":" ==> clear-history
